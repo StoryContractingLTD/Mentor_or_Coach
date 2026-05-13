@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mentor or Coach? | Story Learning &amp; Development</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:ital,wght@0,700;0,800;1,800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;background:#EAF4FB;font-family:'Barlow',system-ui,sans-serif;color:#333}
+#app{min-height:100vh}
+
+/* ---------- Welcome overlay ---------- */
+.welcome-overlay{position:fixed;inset:0;z-index:100;background:#EAF4FB;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .4s ease,visibility .4s ease}
+.welcome-overlay.dismissed{opacity:0;visibility:hidden;pointer-events:none}
+.welcome-inner{text-align:center;max-width:520px;padding:32px;animation:fadeIn .6s ease both}
+.welcome-logo{margin:0 auto 28px}
+.welcome-logo svg{height:44px;width:auto}
+.welcome-title{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:52px;font-weight:800;color:#004B86;letter-spacing:-.02em;line-height:1.05}
+.welcome-sub{color:#666;font-size:16px;line-height:1.7;margin-top:16px}
+.welcome-btn{display:inline-flex;align-items:center;gap:10px;margin-top:28px;background:#0061AD;color:white;border:none;border-radius:24px;padding:14px 32px;font-family:'Barlow',sans-serif;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 8px 28px rgba(0,97,173,.25);transition:transform .15s ease,box-shadow .15s ease}
+.welcome-btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,97,173,.35)}
+.welcome-btn:active{transform:scale(.97)}
+.welcome-pulse{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.8);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ---------- Page transitions ---------- */
+.page{min-height:100vh;animation:pageIn .32s ease both}
+@keyframes pageIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+
+/* ---------- Header ---------- */
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 32px}
+.header-left{display:flex;align-items:center;gap:16px}
+.divider{width:1px;height:28px;background:#c8d8e8}
+.tag{font-size:12px;font-weight:600;color:#8fa0b0;letter-spacing:.2em;text-transform:uppercase}
+.logo{display:inline-flex;align-items:center;justify-content:center;height:40px}
+.logo svg{height:36px;width:auto}
+.header-right{display:flex;align-items:center;gap:12px}
+
+/* Back / start-again button */
+.back-btn{display:inline-flex;align-items:center;gap:8px;background:white;color:#0061AD;border:1.5px solid #d1e3f3;border-radius:20px;padding:8px 16px;font-family:'Barlow',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s ease}
+.back-btn:hover{background:#f0f7fd;border-color:#0061AD}
+
+/* ---------- Container ---------- */
+.container{max-width:880px;margin:0 auto;padding:8px 32px 64px}
+.title-block{text-align:center;margin:24px auto 8px;max-width:720px}
+.title{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:44px;font-weight:800;color:#004B86;letter-spacing:-.02em;line-height:1.1}
+.subtitle{color:#666;font-size:16px;line-height:1.7;margin-top:14px}
+
+/* ---------- Progress ---------- */
+.progress-wrap{max-width:720px;margin:24px auto 32px;display:flex;align-items:center;gap:16px}
+.progress-bar{flex:1;height:6px;background:#dce8f3;border-radius:6px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0061AD,#009FA0);border-radius:6px;transition:width .35s cubic-bezier(.4,0,.2,1)}
+.progress-text{font-size:12px;color:#8fa0b0;font-weight:600;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+
+/* ---------- Question card ---------- */
+.q-card{background:white;border-radius:28px;padding:40px 36px;box-shadow:0 6px 24px rgba(0,97,173,.07);animation:fadeIn .35s ease both}
+.q-section{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;color:#009FA0;letter-spacing:.22em;text-transform:uppercase;margin-bottom:10px}
+.q-section.mentoring{color:#0061AD}
+.q-section.approach{color:#1A3A5C}
+.q-text{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:30px;font-weight:800;color:#1A3A5C;line-height:1.2;letter-spacing:-.005em;margin-bottom:24px}
+.q-hint{color:#7a8a99;font-size:14px;line-height:1.6;margin-bottom:24px;font-style:italic}
+
+.q-options{display:flex;flex-direction:column;gap:10px}
+.q-option{display:flex;align-items:center;gap:14px;background:#f6fafd;border:2px solid #e3edf6;border-radius:16px;padding:16px 20px;cursor:pointer;transition:all .18s ease;text-align:left;font-family:'Barlow',sans-serif;font-size:15.5px;color:#2a3a4a;font-weight:500;width:100%}
+.q-option:hover{border-color:#9bc6e6;background:#eef6fc;transform:translateX(3px)}
+.q-option.selected{border-color:#0061AD;background:#e8f2fb;color:#004B86;font-weight:600}
+.q-option-dot{width:18px;height:18px;border-radius:50%;border:2px solid #b8cbdc;flex-shrink:0;transition:all .18s ease;position:relative}
+.q-option.selected .q-option-dot{border-color:#0061AD;background:#0061AD}
+.q-option.selected .q-option-dot::after{content:'';position:absolute;inset:3px;border-radius:50%;background:white}
+
+/* ---------- Question nav ---------- */
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:12px}
+.nav-btn{display:inline-flex;align-items:center;gap:8px;background:white;color:#0061AD;border:1.5px solid #d1e3f3;border-radius:24px;padding:12px 24px;font-family:'Barlow',sans-serif;font-weight:600;font-size:15px;cursor:pointer;transition:all .2s ease}
+.nav-btn:hover:not(:disabled){background:#f0f7fd;border-color:#0061AD}
+.nav-btn:disabled{opacity:.4;cursor:not-allowed}
+.nav-btn.primary{background:#0061AD;color:white;border-color:#0061AD;box-shadow:0 6px 18px rgba(0,97,173,.2)}
+.nav-btn.primary:hover:not(:disabled){background:#004B86;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,97,173,.3)}
+
+/* ---------- Intro screen ---------- */
+.intro-card{background:white;border-radius:28px;padding:44px 40px;box-shadow:0 6px 24px rgba(0,97,173,.07);margin-top:8px}
+.intro-card h2{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:26px;font-weight:800;color:#004B86;margin-bottom:14px}
+.intro-card p{color:#555;line-height:1.75;font-size:15.5px;margin-bottom:14px}
+.intro-list{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+@media(max-width:680px){.intro-list{grid-template-columns:1fr}}
+.intro-step{background:#f6fafd;border-radius:18px;padding:20px;border:1px solid #e3edf6}
+.intro-step-num{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;color:#0061AD;line-height:1;margin-bottom:6px}
+.intro-step-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#1A3A5C;font-size:15px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.intro-step-desc{color:#666;font-size:13.5px;line-height:1.55}
+.intro-start{text-align:center;margin-top:32px}
+.intro-start .nav-btn.primary{padding:14px 32px;font-size:16px}
+
+/* Path selector cards */
+.intro-prompt{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:#8fa0b0;letter-spacing:.22em;text-transform:uppercase;margin:18px 0 4px;text-align:center}
+.path-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:680px){.path-cards{grid-template-columns:1fr}}
+.path-card{text-align:left;background:#f6fafd;border:2px solid #e3edf6;border-radius:20px;padding:24px 22px;cursor:pointer;transition:all .22s ease;font-family:'Barlow',sans-serif;width:100%;display:flex;flex-direction:column;gap:10px;color:inherit}
+.path-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,97,173,.12)}
+.path-card.task{border-color:#e3edf6}
+.path-card.task:hover{border-color:#0061AD;background:#eef6fc}
+.path-card.developmental{border-color:#e3edf6}
+.path-card.developmental:hover{border-color:#009FA0;background:#e6f5f5}
+.path-icon{width:44px;height:44px;border-radius:50%;background:#e8f2fb;color:#0061AD;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.path-icon svg{width:22px;height:22px}
+.path-card.developmental .path-icon{color:#017A80;background:#dff4f4}
+.path-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:#1A3A5C;line-height:1.1;letter-spacing:-.005em}
+.path-desc{color:#555;font-size:14px;line-height:1.65;flex:1}
+.path-meta{font-size:11.5px;font-weight:700;color:#8fa0b0;letter-spacing:.1em;text-transform:uppercase}
+.path-cta{font-size:14px;font-weight:700;color:#0061AD;margin-top:4px}
+.path-card.developmental .path-cta{color:#017A80}
+
+/* ---------- Result screen ---------- */
+.result-banner{border-radius:28px;padding:38px 36px;color:white;position:relative;overflow:hidden;box-shadow:0 12px 36px rgba(0,97,173,.18)}
+.result-banner.mentoring{background:linear-gradient(135deg,#0061AD 0%,#1A3A5C 100%)}
+.result-banner.coaching{background:linear-gradient(135deg,#009FA0 0%,#017A80 100%)}
+.result-banner.directing{background:linear-gradient(135deg,#fa6b02 0%,#c04e00 100%)}
+.result-banner.delegating{background:linear-gradient(135deg,#1A3A5C 0%,#0A1A2C 100%)}
+.result-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:10px}
+.result-title{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:64px;font-weight:800;letter-spacing:-.02em;line-height:1;margin-bottom:14px}
+.result-summary{font-size:17px;line-height:1.65;max-width:640px;color:rgba(255,255,255,.95)}
+.result-scores{display:flex;gap:14px;margin-top:24px;flex-wrap:wrap}
+.score-pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;letter-spacing:.04em}
+.score-pill strong{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;margin-left:4px}
+
+.result-flag{margin-top:20px;background:#fff5e8;border:1.5px solid #f5c98e;border-radius:18px;padding:18px 22px;display:flex;gap:14px;align-items:flex-start}
+.result-flag-icon{flex-shrink:0;width:28px;height:28px;background:#fa6b02;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:18px}
+.result-flag-text{font-size:14.5px;line-height:1.6;color:#5a3a10}
+.result-flag-text strong{color:#3a2400}
+
+.result-section{margin-top:28px;background:white;border-radius:24px;padding:32px;box-shadow:0 6px 20px rgba(0,97,173,.06)}
+.result-section h3{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-size:22px;font-weight:800;color:#004B86;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.result-section h3::before{content:'';width:4px;height:22px;background:#0061AD;border-radius:2px}
+.result-section.coaching h3{color:#017A80}
+.result-section.coaching h3::before{background:#009FA0}
+.result-section p{color:#555;line-height:1.75;font-size:15px;margin-bottom:10px}
+.result-section ul{margin-left:4px;margin-top:8px;list-style:none}
+.result-section li{color:#555;line-height:1.7;font-size:14.5px;padding-left:22px;position:relative;margin-bottom:6px}
+.result-section li::before{content:'';position:absolute;left:4px;top:.7em;width:8px;height:8px;border-radius:50%;background:#0061AD}
+.result-section.coaching li::before{background:#009FA0}
+
+.behaviour-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}
+@media(max-width:600px){.behaviour-grid{grid-template-columns:1fr}}
+.behaviour-card{background:#f6fafd;border-radius:14px;padding:16px 18px;border:1px solid #e3edf6}
+.behaviour-card-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#1A3A5C;font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.behaviour-card-text{color:#555;font-size:13.5px;line-height:1.55}
+
+.next-steps{counter-reset:nstep;margin-top:14px}
+.next-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #e8eff5}
+.next-step:last-child{border-bottom:none}
+.next-step-num{counter-increment:nstep;flex-shrink:0;width:32px;height:32px;background:#e8f2fb;color:#0061AD;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Barlow Condensed',sans-serif;font-size:16px}
+.next-step-num::before{content:counter(nstep)}
+.result-section.coaching .next-step-num{background:#dff4f4;color:#017A80}
+.next-step-text{flex:1;color:#444;line-height:1.65;font-size:14.5px}
+.next-step-text strong{color:#1A3A5C;font-weight:700}
+
+/* Alternative toggle */
+.alt-toggle{margin-top:20px;text-align:center}
+.alt-btn{background:transparent;border:1.5px solid #c5d3e1;color:#5a6b7c;border-radius:22px;padding:11px 22px;font-family:'Barlow',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s ease}
+.alt-btn:hover{border-color:#0061AD;color:#0061AD;background:#f0f7fd}
+
+.alt-panel{margin-top:18px;background:#f9fbfd;border:1px solid #e3edf6;border-radius:20px;padding:24px;animation:fadeIn .3s ease both}
+.alt-panel h4{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#1A3A5C;margin-bottom:8px}
+.alt-panel p{color:#666;line-height:1.7;font-size:14px;margin-bottom:8px}
+
+/* Action row */
+.action-row{display:flex;gap:12px;justify-content:center;margin-top:32px;flex-wrap:wrap}
+.action-btn{display:inline-flex;align-items:center;gap:10px;border:none;border-radius:24px;padding:14px 28px;font-family:'Barlow',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .18s ease}
+.action-btn.primary{background:#0061AD;color:white;box-shadow:0 8px 24px rgba(0,97,173,.22)}
+.action-btn.primary:hover{background:#004B86;transform:translateY(-1px);box-shadow:0 12px 30px rgba(0,97,173,.32)}
+.action-btn.secondary{background:white;color:#0061AD;border:1.5px solid #d1e3f3}
+.action-btn.secondary:hover{background:#f0f7fd;border-color:#0061AD}
+
+/* Audio toggle */
+.audio-toggle{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;background:white;border:1.5px solid #d1e3f3;border-radius:50%;color:#0061AD;cursor:pointer;transition:all .2s ease;padding:0}
+.audio-toggle:hover{background:#f0f7fd;border-color:#0061AD;transform:scale(1.06)}
+.audio-toggle.muted{color:#8fa0b0;border-color:#dde5ed;background:#f6f8fa}
+.audio-toggle svg{width:18px;height:18px}
+
+/* Footer note */
+.footer-note{text-align:center;color:#8fa0b0;font-size:12px;margin-top:36px;line-height:1.6;letter-spacing:.02em}
+
+/* Mobile tweaks */
+@media (max-width:600px){
+  .container{padding:8px 18px 48px}
+  .header{padding:12px 18px}
+  .title{font-size:36px}
+  .q-card{padding:28px 22px;border-radius:22px}
+  .q-text{font-size:24px}
+  .result-banner{padding:28px 24px;border-radius:22px}
+  .result-title{font-size:48px}
+  .result-section{padding:24px 22px;border-radius:20px}
+  .intro-card{padding:32px 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- ====================== WELCOME OVERLAY ====================== -->
+<div class="welcome-overlay" id="welcome-overlay">
+  <div class="welcome-inner">
+    <div class="welcome-logo" id="welcome-logo"></div>
+    <h1 class="welcome-title">Mentor or Coach?</h1>
+    <p class="welcome-sub">A short decision tool to help you choose the right developmental approach for someone in your team, grounded in the Liberator framework and Story&rsquo;s Mentoring and Coaching Programme.</p>
+    <button class="welcome-btn" id="welcome-btn"><span class="welcome-pulse"></span> Begin</button>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<script>
+// =====================================================================
+//  STORY LOGO (used in header + welcome)
+// =====================================================================
+const STORY_LOGO_SVG = '<svg viewBox="0 0 2081 472" xmlns="http://www.w3.org/2000/svg"><path fill="#0061AD" d="M1392,473C928,473,464.6,473,1.1,473C1.1,315.7,1.1,158.5,1.1,1.1C694.7,1.1,1388.3,1.1,2082,1.1C2082,158.4,2082,315.7,2082,473C1852.1,473,1622.3,473,1392,473M1552.1,236.6C1558.3,230.1,1565.3,224.2,1570.5,217C1587.8,192.6,1593.4,164.9,1588.7,135.6C1585,112.6,1574.7,92.8,1555.2,78.8C1537.1,65.8,1516.2,62.3,1494.8,62.2C1430.1,61.9,1365.4,62.1,1300.8,62.1C1299,62.1,1297.2,62.1,1295.6,62.1C1271,177.8,1246.7,292.7,1222.2,408C1257.2,408,1291.8,408,1326.5,407.9C1327.6,407.9,1329.5,406,1329.8,404.8C1332.7,392,1335.3,379.2,1338,366.4C1344.7,334.3,1351.3,302.2,1358.2,270.2C1358.4,269,1360.2,267.3,1361.3,267.2C1374.9,266.4,1386.8,269.8,1394.3,282.2C1398.8,289.6,1403.4,297,1406.8,304.8C1420.9,337.5,1434.6,370.4,1448.2,403.2C1449.7,406.7,1451.2,408.1,1455.3,408.1C1489.5,407.9,1523.6,408,1557.8,408C1559.4,408,1561,408,1563.4,408C1555.7,389.3,1548.5,371.1,1540.8,353.3C1529.2,326.6,1516.8,300.3,1498.9,277.2C1495,272.1,1490.5,267.6,1486.1,262.5C1510,258.5,1532.4,252,1552.1,236.6M1064.4,404.9C1103,392.3,1134.2,369.2,1158.9,337.3C1180.5,309.4,1193.6,277.7,1200.1,243C1206.2,210.3,1206,177.8,1194.8,146.2C1179.7,103.6,1151,74.7,1106.8,62.9C1073.5,54.1,1039.6,54.6,1005.8,59.9C960.6,67,923.1,88.7,894.3,123.8C850.5,177.1,833.9,238.8,845.4,306.8C852.4,348.4,876,378.9,914.6,397.1C945.4,411.6,978.2,415,1011.7,413.6C1029.3,412.8,1046.7,410.6,1064.4,404.9M373.3,145.4C374.8,151.2,376.4,157.1,378,163.4C410.7,161.7,443.8,159.9,477.3,158.1C476.4,152.6,475.8,148,474.9,143.5C470.7,122.5,461.7,103.9,445.4,89.4C427.4,73.4,405.6,65.5,382.3,61.1C358.7,56.5,334.8,55.7,310.8,57C286.9,58.4,263.9,63.4,242.4,74.3C200.5,95.6,179.7,138,189.1,183.4C193.8,206.7,208.6,222.5,227.9,234.8C251,249.4,276.6,258.6,302.1,268C315.5,272.9,329.2,277.1,340.8,285.7C347.1,290.4,351.9,296.2,353,304.3C354.9,317.9,348,330.6,334.8,337.9C320.9,345.6,305.9,346.3,290.7,344.9C268.5,342.7,254.3,330.2,249.5,308.6C247.9,301.6,247.7,294.2,246.8,286.6C213.7,288.8,180.6,291,146.2,293.3C147.2,303.9,147.2,314.2,149.2,324.2C154.7,351.6,168.1,374.4,191.7,390.2C215.1,405.8,241.9,410.5,269.1,412.8C293.2,414.9,317.3,414.3,341.3,411.1C371,407.1,397.5,396.4,419.1,375.5C450.7,345,461.4,308.4,448.8,266C442,242.9,425.6,227,405.9,214.2C382.8,199.3,357.1,190,331.7,179.9C319.9,175.2,308.3,169.6,297.4,163.2C289.3,158.5,285.1,150.7,287.9,140.7C290.5,131.2,297.1,125.5,305.8,122C315.1,118.4,324.9,118.1,334.7,119C352.2,120.5,365.8,127.8,373.3,145.4M1696.5,408C1722.3,408,1748.2,408,1774,408.1C1777.1,408.1,1778.5,407.5,1779.2,403.9C1786.3,369.2,1793.5,334.6,1801.2,300C1803.4,289.6,1803.3,278.3,1811.6,270C1813.5,268.1,1815,265.8,1816.6,263.7C1864.7,201.5,1912.9,139.3,1961,77.1C1964.7,72.4,1968.3,67.5,1972.1,62.5C1971.2,62.2,1970.9,62.1,1970.6,62.1C1931.4,62.1,1892.3,62,1853.1,62.2C1851.4,62.2,1849.1,63.6,1848,65.1C1824.1,99.1,1800.4,133.1,1776.6,167.2C1771.4,174.7,1766.1,182.2,1760.5,190.1C1759.4,187.7,1758.6,186,1757.9,184.4C1741.6,144.9,1725.2,105.5,1709,66.1C1707.7,62.9,1706.1,62,1702.8,62C1668.3,62.1,1633.8,62.1,1599.3,62.1C1598.2,62.1,1597.1,62.2,1595.7,62.3C1596.2,63.6,1596.5,64.5,1596.9,65.4C1609.5,91.2,1622.2,117.1,1634.8,143C1655.6,185.5,1676.4,228.1,1697.1,270.7C1698.1,272.8,1699,275.5,1698.5,277.7C1690.9,313.8,1683.1,349.9,1675.3,386C1673.8,393.2,1672.4,400.4,1670.9,408C1679.5,408,1687.5,408,1696.5,408M829.5,62.1C810,62.1,790.5,62.1,771,62.1C693.4,62.1,615.7,62.1,538.1,62C534.5,62,532.6,62.3,531.8,66.7C529,81.8,525.5,96.8,522.3,111.9C519.9,123.5,517.5,135.1,515.1,147.1C551,147.1,586.4,147.1,622.3,147.1C612.9,191,603.4,234.3,594.1,277.7C584.8,321,575.6,364.3,566.3,408C601.3,408,636,408,670.6,407.8C671.8,407.8,673.6,405.7,673.9,404.3C681.3,371.2,688.6,338,695.7,304.9C704.9,262.7,713.9,220.4,723,178.2C725.2,167.8,727.6,157.5,730,147C767.4,147,804.5,147,842,147C848,118.6,853.9,90.5,859.9,62.1C849.8,62.1,840.2,62.1,829.5,62.1z"/><path fill="#FEFFFF" d="M1551.8,236.8C1532.4,252,1510,258.5,1486.1,262.5C1490.5,267.6,1495,272.1,1498.9,277.2C1516.8,300.3,1529.2,326.6,1540.8,353.3C1548.5,371.1,1555.7,389.3,1563.4,408C1561,408,1559.4,408,1557.8,408C1523.6,408,1489.5,407.9,1455.3,408.1C1451.2,408.1,1449.7,406.7,1448.2,403.2C1434.6,370.4,1420.9,337.5,1406.8,304.8C1403.4,297,1398.8,289.6,1394.3,282.2C1386.8,269.8,1374.9,266.4,1361.3,267.2C1360.2,267.3,1358.4,269,1358.2,270.2C1351.3,302.2,1344.7,334.3,1338,366.4C1335.3,379.2,1332.7,392,1329.8,404.8C1329.5,406,1327.6,407.9,1326.5,407.9C1291.8,408,1257.2,408,1222.2,408C1246.7,292.7,1271,177.8,1295.6,62.1C1297.2,62.1,1299,62.1,1300.8,62.1C1365.4,62.1,1430.1,61.9,1494.8,62.2C1516.2,62.3,1537.1,65.8,1555.2,78.8C1574.7,92.8,1585,112.6,1588.7,135.6C1593.4,164.9,1587.8,192.6,1570.5,217C1565.3,224.2,1558.3,230.1,1551.8,236.8M1402.5,202.9C1417.4,202.2,1432.4,202.2,1447.3,200.8C1461.3,199.5,1473.4,193.2,1481.9,181.6C1493.4,165.6,1493.9,136.1,1463,133.4C1438.2,131.3,1413.1,132,1387.9,131.5C1382.8,155.6,1377.8,179,1372.7,202.9C1382.6,202.9,1392.1,202.9,1402.5,202.9z"/><path fill="#FEFFFF" d="M1064,405C1046.7,410.6,1029.3,412.8,1011.7,413.6C978.2,415,945.4,411.6,914.6,397.1C876,378.9,852.4,348.4,845.4,306.8C833.9,238.8,850.5,177.1,894.3,123.8C923.1,88.7,960.6,67,1005.8,59.9C1039.6,54.6,1073.5,54.1,1106.8,62.9C1151,74.7,1179.7,103.6,1194.8,146.2C1206,177.8,1206.2,210.3,1200.1,243C1193.6,277.7,1180.5,309.4,1158.9,337.3C1134.2,369.2,1103,392.3,1064,405M978.7,330C1007.1,341.4,1038.2,334,1058.6,311.4C1075.1,293.2,1084.6,271.5,1091,248.3C1096.6,227.8,1101.2,207.1,1098.1,185.5C1093.8,155.3,1071,135.2,1040.5,135C1014,134.8,993.9,146.9,979.2,167.9C956.5,200.4,947.1,237.3,946.8,276.3C946.6,299.5,956.3,318.5,978.7,330z"/><path fill="#FEFEFF" d="M373.2,145C365.8,127.8,352.2,120.5,334.7,119C324.9,118.1,315.1,118.4,305.8,122C297.1,125.5,290.5,131.2,287.9,140.7C285.1,150.7,289.3,158.5,297.4,163.2C308.3,169.6,319.9,175.2,331.7,179.9C357.1,190,382.8,199.3,405.9,214.2C425.6,227,442,242.9,448.8,266C461.4,308.4,450.7,345,419.1,375.5C397.5,396.4,371,407.1,341.3,411.1C317.3,414.3,293.2,414.9,269.1,412.8C241.9,410.5,215.1,405.8,191.7,390.2C168.1,374.4,154.7,351.6,149.2,324.2C147.2,314.2,147.2,303.9,146.2,293.3C180.6,291,213.7,288.8,246.8,286.6C247.7,294.2,247.9,301.6,249.5,308.6C254.3,330.2,268.5,342.7,290.7,344.9C305.9,346.3,320.9,345.6,334.8,337.9C348,330.6,354.9,317.9,353,304.3C351.9,296.2,347.1,290.4,340.8,285.7C329.2,277.1,315.5,272.9,302.1,268C276.6,258.6,251,249.4,227.9,234.8C208.6,222.5,193.8,206.7,189.1,183.4C179.7,138,200.5,95.6,242.4,74.3C263.9,63.4,286.9,58.4,310.8,57C334.8,55.7,358.7,56.5,382.3,61.1C405.6,65.5,427.4,73.4,445.4,89.4C461.7,103.9,470.7,122.5,474.9,143.5C475.8,148,476.4,152.6,477.3,158.1C443.8,159.9,410.7,161.7,378,163.4C376.4,157.1,374.8,151.2,373.2,145z"/><path fill="#FEFEFF" d="M1696,408C1687.5,408,1679.5,408,1670.9,408C1672.4,400.4,1673.8,393.2,1675.3,386C1683.1,349.9,1690.9,313.8,1698.5,277.7C1699,275.5,1698.1,272.8,1697.1,270.7C1676.4,228.1,1655.6,185.5,1634.8,143C1622.2,117.1,1609.5,91.2,1596.9,65.4C1596.5,64.5,1596.2,63.6,1595.7,62.3C1597.1,62.2,1598.2,62.1,1599.3,62.1C1633.8,62.1,1668.3,62.1,1702.8,62C1706.1,62,1707.7,62.9,1709,66.1C1725.2,105.5,1741.6,144.9,1757.9,184.4C1758.6,186,1759.4,187.7,1760.5,190.1C1766.1,182.2,1771.4,174.7,1776.6,167.2C1800.4,133.1,1824.1,99.1,1848,65.1C1849.1,63.6,1851.4,62.2,1853.1,62.2C1892.3,62,1931.4,62.1,1970.6,62.1C1970.9,62.1,1971.2,62.2,1972.1,62.5C1968.3,67.5,1964.7,72.4,1961,77.1C1912.9,139.3,1864.7,201.5,1816.6,263.7C1815,265.8,1813.5,268.1,1811.6,270C1803.3,278.3,1803.4,289.6,1801.2,300C1793.5,334.6,1786.3,369.2,1779.2,403.9C1778.5,407.5,1777.1,408.1,1774,408.1C1748.2,408,1722.3,408,1696,408z"/><path fill="#FFF" d="M829.5,62.1C840.2,62.1,849.8,62.1,859.9,62.1C853.9,90.5,848,118.6,842,147C804.5,147,767.4,147,730,147C727.6,157.5,725.2,167.8,723,178.2C713.9,220.4,704.9,262.7,695.7,304.9C688.6,338,681.3,371.2,673.9,404.3C673.6,405.7,671.8,407.8,670.6,407.8C636,408,601.3,408,566.3,408C575.6,364.3,584.8,321,594.1,277.7C603.4,234.3,612.9,191,622.3,147.1C586.4,147.1,551,147.1,515.1,147.1C517.5,135.1,519.9,123.5,522.3,111.9C525.5,96.8,529,81.8,531.8,66.7C532.6,62.3,534.5,62,538.1,62C615.7,62.1,693.4,62.1,771,62.1C790.5,62.1,810,62.1,829.5,62.1z"/><path fill="#0161AD" d="M1402,202.9C1392.1,202.9,1382.6,202.9,1372.7,202.9C1377.8,179,1382.8,155.6,1387.9,131.5C1413.1,132,1438.2,131.3,1463,133.4C1493.9,136.1,1493.4,165.6,1481.9,181.6C1473.4,193.2,1461.3,199.5,1447.3,200.8C1432.4,202.2,1417.4,202.2,1402,202.9z"/><path fill="#0161AD" d="M978.4,329.8C956.3,318.5,946.6,299.5,946.8,276.3C947.1,237.3,956.5,200.4,979.2,167.9C993.9,146.9,1014,134.8,1040.5,135C1071,135.2,1093.8,155.3,1098.1,185.5C1101.2,207.1,1096.6,227.8,1091,248.3C1084.6,271.5,1075.1,293.2,1058.6,311.4C1038.2,334,1007.1,341.4,978.4,329.8z"/></svg>';
+
+document.getElementById('welcome-logo').innerHTML = STORY_LOGO_SVG;
+
+// =====================================================================
+//  AUDIO
+//  Matched to the Wayfinder's pattern: soft sine waves, very low gain,
+//  quick attack and exponential decay. Everything stays well under .025
+//  peak gain so this never intrudes on the room.
+// =====================================================================
+let audioCtx = null;
+let audioEnabled = true;
+try {
+  const saved = localStorage.getItem('mc-audio');
+  if (saved === 'off') audioEnabled = false;
+} catch(e) {}
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// Warm up the audio context on first gesture (autoplay policy)
+document.addEventListener('click', function initAudio() {
+  try { getCtx(); } catch(e) {}
+  document.removeEventListener('click', initAudio);
+}, { once: true });
+
+const AUDIO_ON_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+const AUDIO_OFF_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+
+function toggleAudio() {
+  audioEnabled = !audioEnabled;
+  try { localStorage.setItem('mc-audio', audioEnabled ? 'on' : 'off'); } catch(e) {}
+  const btn = document.getElementById('audio-toggle');
+  if (btn) {
+    btn.innerHTML = audioEnabled ? AUDIO_ON_ICON : AUDIO_OFF_ICON;
+    btn.classList.toggle('muted', !audioEnabled);
+    btn.title = audioEnabled ? 'Sound on, click to mute' : 'Sound off, click to enable';
+  }
+  if (audioEnabled) playClick();
+}
+
+// Soft single tick, used for option selection and small confirmations.
+function playClick() {
+  if (!audioEnabled) return;
+  try {
+    const ctx = getCtx(), now = ctx.currentTime;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = 'sine'; osc.frequency.value = 880;
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(0.012, now + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.1);
+  } catch(e) {}
+}
+
+// Two-note ascending chime, used for moving forward / starting.
+function playAdvance() {
+  if (!audioEnabled) return;
+  try {
+    const ctx = getCtx(), now = ctx.currentTime;
+    [{ f: 523.25, d: 0 }, { f: 783.99, d: 0.07 }].forEach(({ f, d }) => {
+      const osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = f;
+      g.gain.setValueAtTime(0, now + d);
+      g.gain.linearRampToValueAtTime(0.02, now + d + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + d + 0.5);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(now + d); osc.stop(now + d + 0.55);
+    });
+  } catch(e) {}
+}
+
+// Two-note descending chime, used for back / start-over.
+function playReturn() {
+  if (!audioEnabled) return;
+  try {
+    const ctx = getCtx(), now = ctx.currentTime;
+    [{ f: 783.99, d: 0 }, { f: 523.25, d: 0.09 }].forEach(({ f, d }) => {
+      const osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = f;
+      g.gain.setValueAtTime(0, now + d);
+      g.gain.linearRampToValueAtTime(0.022, now + d + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + d + 0.55);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(now + d); osc.stop(now + d + 0.6);
+    });
+  } catch(e) {}
+}
+
+// Three-note major-chord swell for the result reveal.
+function playReveal() {
+  if (!audioEnabled) return;
+  try {
+    const ctx = getCtx(), now = ctx.currentTime;
+    [{ f: 523.25, d: 0 }, { f: 659.25, d: 0.06 }, { f: 783.99, d: 0.12 }].forEach(({ f, d }) => {
+      const osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = f;
+      g.gain.setValueAtTime(0, now + d);
+      g.gain.linearRampToValueAtTime(0.018, now + d + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + d + 1.0);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(now + d); osc.stop(now + d + 1.1);
+    });
+  } catch(e) {}
+}
+
+// Soft descending tone for the PDF download moment.
+function playDownload() {
+  if (!audioEnabled) return;
+  try {
+    const ctx = getCtx(), now = ctx.currentTime;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(660, now);
+    osc.frequency.exponentialRampToValueAtTime(330, now + 0.25);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(0.022, now + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.32);
+  } catch(e) {}
+}
+
+// =====================================================================
+//  QUESTION DATA
+//  Three sections: Can Do, Will Do, Approach
+//  All options scored on a 1-4 scale (or for approach, mapped to a
+//  coaching-bias score 0-10).
+// =====================================================================
+
+const QUESTIONS = [
+  // --- CAN DO (capability, skill, judgement) ---
+  {
+    section: 'Can Do',
+    sectionClass: 'mentoring',
+    hint: 'Skill, knowledge, experience and judgement for this specific task or area.',
+    text: 'How would you describe their current skill and knowledge for this specific task?',
+    options: [
+      { label: 'New to it, still learning the basics', score: 1 },
+      { label: 'Growing, getting there but not yet solid', score: 2 },
+      { label: 'Capable, can do the work confidently', score: 3 },
+      { label: 'Fully expert, may know more than I do', score: 4 }
+    ],
+    dimension: 'canDo'
+  },
+  {
+    section: 'Can Do',
+    sectionClass: 'mentoring',
+    hint: 'Track record of doing this task or similar work.',
+    text: 'Have they done this task successfully before?',
+    options: [
+      { label: 'Never, or never independently', score: 1 },
+      { label: 'A few times, with my support', score: 2 },
+      { label: 'Multiple times, reliably', score: 3 },
+      { label: 'It is routine for them', score: 4 }
+    ],
+    dimension: 'canDo'
+  },
+  {
+    section: 'Can Do',
+    sectionClass: 'mentoring',
+    hint: 'Their ability to make sound calls in this area.',
+    text: 'How sound is their judgement on this kind of work?',
+    options: [
+      { label: 'Needs full guidance to make decisions', score: 1 },
+      { label: 'Forms a view but wants input before deciding', score: 2 },
+      { label: 'Generally sound, just the occasional check-in', score: 3 },
+      { label: 'Trusts their own judgement and gets it right', score: 4 }
+    ],
+    dimension: 'canDo'
+  },
+  {
+    section: 'Can Do',
+    sectionClass: 'mentoring',
+    hint: 'A test of mastery is whether someone can pass the knowledge on.',
+    text: 'Could they explain or teach this to a colleague?',
+    options: [
+      { label: 'Not yet, they are still learning themselves', score: 1 },
+      { label: 'With prompts and support from me', score: 2 },
+      { label: 'Yes, in most areas', score: 3 },
+      { label: 'Confidently and with depth', score: 4 }
+    ],
+    dimension: 'canDo'
+  },
+
+  // --- WILL DO (motivation, confidence, ownership) ---
+  {
+    section: 'Will Do',
+    sectionClass: 'approach',
+    hint: 'Motivation, drive and personal investment in the work.',
+    text: 'What is their motivation level for this work?',
+    options: [
+      { label: 'Reluctant, going through the motions', score: 1 },
+      { label: 'Willing but a bit hesitant', score: 2 },
+      { label: 'Engaged and committed', score: 3 },
+      { label: 'Genuinely owns it, fully invested', score: 4 }
+    ],
+    dimension: 'willDo'
+  },
+  {
+    section: 'Will Do',
+    sectionClass: 'approach',
+    hint: 'Their belief in their own ability to handle the work.',
+    text: 'How confident are they in this area?',
+    options: [
+      { label: 'Low, often holds back', score: 1 },
+      { label: 'Building, but still tentative', score: 2 },
+      { label: 'Solid, gets on with it', score: 3 },
+      { label: 'High (occasionally too high)', score: 4 }
+    ],
+    dimension: 'willDo'
+  },
+  {
+    section: 'Will Do',
+    sectionClass: 'approach',
+    hint: 'Are they prepared to be accountable for outcomes?',
+    text: 'How do they respond to responsibility for the outcome?',
+    options: [
+      { label: 'Resists or deflects it', score: 1 },
+      { label: 'Accepts when reminded', score: 2 },
+      { label: 'Accepts willingly', score: 3 },
+      { label: 'Actively seeks responsibility', score: 4 }
+    ],
+    dimension: 'willDo'
+  },
+  {
+    section: 'Will Do',
+    sectionClass: 'approach',
+    hint: 'How proactive are they without you prompting?',
+    text: 'How much initiative do they take?',
+    options: [
+      { label: 'Waits to be told what to do', score: 1 },
+      { label: 'Checks with me before acting', score: 2 },
+      { label: 'Acts and updates me afterwards', score: 3 },
+      { label: 'Runs with things and manages themselves', score: 4 }
+    ],
+    dimension: 'willDo'
+  },
+
+  // --- APPROACH (the distinguishing questions) ---
+  {
+    section: 'Approach',
+    sectionClass: 'approach',
+    hint: 'Mentoring needs an expertise gap. Coaching often works without one.',
+    text: 'On this specific topic, who holds more expertise?',
+    options: [
+      { label: 'I do, significantly more than they do', coachBias: 0 },
+      { label: 'I do, but only somewhat more', coachBias: 3 },
+      { label: 'We are roughly equal', coachBias: 7 },
+      { label: 'They may know more than I do', coachBias: 10 }
+    ],
+    dimension: 'approach'
+  },
+  {
+    section: 'Approach',
+    sectionClass: 'approach',
+    hint: 'Mentoring transfers knowledge. Coaching sharpens their own thinking.',
+    text: 'What is the goal of the support?',
+    options: [
+      { label: 'Transferring knowledge and shaping their judgement', coachBias: 0 },
+      { label: 'A bit of both, but mostly knowledge transfer', coachBias: 3 },
+      { label: 'A bit of both, but mostly helping them think', coachBias: 7 },
+      { label: 'Helping them sharpen judgement they already have', coachBias: 10 }
+    ],
+    dimension: 'approach'
+  },
+  {
+    section: 'Approach',
+    sectionClass: 'approach',
+    hint: 'Coaching steps back from direction. Mentoring stays close.',
+    text: 'How would they likely respond to close direction from me right now?',
+    options: [
+      { label: 'Welcome it, they want the steer', coachBias: 0 },
+      { label: 'Accept it, but might want more space soon', coachBias: 4 },
+      { label: 'Tolerate it, but feel a bit hemmed in', coachBias: 7 },
+      { label: 'Find it intrusive or counterproductive', coachBias: 10 }
+    ],
+    dimension: 'approach'
+  },
+  {
+    section: 'Approach',
+    sectionClass: 'approach',
+    hint: 'Mentoring tends to be broader and longer-term. Coaching is often more focused.',
+    text: 'What is the focus of the support?',
+    options: [
+      { label: 'Longer-term growth, career direction and confidence', coachBias: 0 },
+      { label: 'Mostly growth, with some specific skills attached', coachBias: 3 },
+      { label: 'Mostly specific skills, with some broader development', coachBias: 7 },
+      { label: 'A specific task, skill or performance area', coachBias: 10 }
+    ],
+    dimension: 'approach'
+  }
+];
+
+// =====================================================================
+//  DEVELOPMENTAL QUESTION DATA
+//  Used when the support isn't tied to a specific task or skill,
+//  but to broader development: confidence, career direction, growth,
+//  perspective or self-awareness. Each option carries a coachBias
+//  score (0-10): low = mentoring, high = coaching.
+// =====================================================================
+
+const DEV_QUESTIONS = [
+  {
+    section: 'Development Goal',
+    sectionClass: 'approach',
+    hint: 'What kind of growth are you trying to support?',
+    text: 'What is the primary development goal here?',
+    options: [
+      { label: 'Build confidence in their role', coachBias: 2, goalLabel: 'Confidence' },
+      { label: 'Find clarity on career direction or a transition', coachBias: 1, goalLabel: 'Career direction' },
+      { label: 'Broaden perspective beyond their function or team', coachBias: 5, goalLabel: 'Perspective' },
+      { label: 'Sharpen their own thinking on choices ahead', coachBias: 9, goalLabel: 'Sharpened thinking' }
+    ],
+    dimension: 'dev'
+  },
+  {
+    section: 'Experience Level',
+    sectionClass: 'approach',
+    hint: 'Where they sit in their journey shapes what they need.',
+    text: 'How established is the person in their current role?',
+    options: [
+      { label: 'New or in their first year', coachBias: 1, levelLabel: 'New' },
+      { label: 'Settled but still building', coachBias: 3, levelLabel: 'Settled' },
+      { label: 'Experienced and capable', coachBias: 7, levelLabel: 'Experienced' },
+      { label: 'Highly experienced, looking for stretch', coachBias: 9, levelLabel: 'Stretching' }
+    ],
+    dimension: 'dev'
+  },
+  {
+    section: 'What Would Help',
+    sectionClass: 'approach',
+    hint: 'Mentors share. Coaches question. Which would land better for them?',
+    text: 'What would help them more right now?',
+    options: [
+      { label: 'Hearing how someone else navigated this', coachBias: 1 },
+      { label: 'Mostly experience and stories, with some questions', coachBias: 3 },
+      { label: 'Mostly questions and reflection, with some experience', coachBias: 7 },
+      { label: 'Being questioned into their own answers', coachBias: 9 }
+    ],
+    dimension: 'dev'
+  },
+  {
+    section: 'Self-awareness',
+    sectionClass: 'approach',
+    hint: 'Coaching leans on self-awareness. Mentoring helps build it.',
+    text: 'How developed is their self-awareness?',
+    options: [
+      { label: 'Still building, often needs help seeing patterns', coachBias: 1 },
+      { label: 'Reasonable, with some clear blind spots', coachBias: 4 },
+      { label: 'Good, reflects well on their own work', coachBias: 7 },
+      { label: 'Strong, knows themselves well', coachBias: 9 }
+    ],
+    dimension: 'dev'
+  },
+  {
+    section: 'Relationship Type',
+    sectionClass: 'approach',
+    hint: 'Mentoring sits outside the line. Coaching can come from anywhere.',
+    text: 'What kind of relationship do they need?',
+    options: [
+      { label: 'Someone outside their line who has been further along the journey', coachBias: 1 },
+      { label: 'Someone from a different function or area for fresh perspective', coachBias: 3 },
+      { label: 'A skilled developmental partner, function does not matter', coachBias: 6 },
+      { label: 'A trained thinking partner for a specific topic', coachBias: 9 }
+    ],
+    dimension: 'dev'
+  },
+  {
+    section: 'Time Horizon',
+    sectionClass: 'approach',
+    hint: 'Coaching is usually shorter and goal-focused. Mentoring runs longer.',
+    text: 'What is the likely time horizon?',
+    options: [
+      { label: 'A defined topic over a few weeks', coachBias: 9 },
+      { label: 'A few months of focused support', coachBias: 6 },
+      { label: 'Six months to a year of regular conversations', coachBias: 2 },
+      { label: 'An ongoing relationship over a year or more', coachBias: 1 }
+    ],
+    dimension: 'dev'
+  }
+];
+
+function getQuestions() {
+  return state.path === 'developmental' ? DEV_QUESTIONS : QUESTIONS;
+}
+
+// =====================================================================
+//  STATE
+// =====================================================================
+let state = {
+  view: 'intro',  // 'intro' | 'question' | 'result'
+  path: null,     // 'task' | 'developmental'
+  qIndex: 0,
+  answers: []     // sized when path is chosen
+};
+
+function startPath(path) {
+  state.path = path;
+  state.view = 'question';
+  state.qIndex = 0;
+  const qs = path === 'developmental' ? DEV_QUESTIONS : QUESTIONS;
+  state.answers = new Array(qs.length).fill(null);
+  playAdvance();
+  render();
+}
+
+// =====================================================================
+//  HEADER
+// =====================================================================
+function buildHeader(rightEl) {
+  const header = document.createElement('div');
+  header.className = 'header';
+
+  const left = document.createElement('div');
+  left.className = 'header-left';
+  left.innerHTML = '<div class="logo">' + STORY_LOGO_SVG + '</div><div class="divider"></div><span class="tag">L&amp;D Decision Tool</span>';
+  header.appendChild(left);
+
+  const right = document.createElement('div');
+  right.className = 'header-right';
+  if (rightEl) right.appendChild(rightEl);
+
+  // Audio toggle (always present)
+  const audioBtn = document.createElement('button');
+  audioBtn.className = 'audio-toggle' + (audioEnabled ? '' : ' muted');
+  audioBtn.id = 'audio-toggle';
+  audioBtn.innerHTML = audioEnabled ? AUDIO_ON_ICON : AUDIO_OFF_ICON;
+  audioBtn.title = audioEnabled ? 'Sound on, click to mute' : 'Sound off, click to enable';
+  audioBtn.addEventListener('click', toggleAudio);
+  right.appendChild(audioBtn);
+
+  header.appendChild(right);
+
+  return header;
+}
+
+// =====================================================================
+//  RENDER
+// =====================================================================
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  const page = document.createElement('div');
+  page.className = 'page';
+
+  if (state.view === 'intro') {
+    page.appendChild(buildHeader());
+    page.appendChild(buildIntro());
+  } else if (state.view === 'question') {
+    const backBtn = document.createElement('button');
+    backBtn.className = 'back-btn';
+    backBtn.innerHTML = '&larr; Start over';
+    backBtn.addEventListener('click', () => { playReturn(); resetAll(); });
+    page.appendChild(buildHeader(backBtn));
+    page.appendChild(buildQuestion());
+  } else if (state.view === 'result') {
+    const backBtn = document.createElement('button');
+    backBtn.className = 'back-btn';
+    backBtn.innerHTML = '&larr; Start over';
+    backBtn.addEventListener('click', () => { playReturn(); resetAll(); });
+    page.appendChild(buildHeader(backBtn));
+    page.appendChild(buildResult());
+  }
+
+  app.appendChild(page);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =====================================================================
+//  INTRO SCREEN
+// =====================================================================
+function buildIntro() {
+  const container = document.createElement('div');
+  container.className = 'container';
+
+  const taskIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
+  const devIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M5 8c0-2 2-4 5-4 1.5 0 3 .5 4 2-1 2.5-3 4-5 4-2 0-4-1-4-2z"/><path d="M19 12c0-2-2-4-5-4-1 0-2 .5-2.5 1 .5 2 2 3 4 3 1.5 0 3.5-.5 3.5 0z"/></svg>';
+
+  container.innerHTML =
+    '<div class="title-block">' +
+      '<h1 class="title">Mentor or Coach?</h1>' +
+      '<p class="subtitle">A short tool to help you choose the right developmental approach when someone needs support. It draws on Story&rsquo;s Mentoring and Coaching definitions and the Liberator framework.</p>' +
+    '</div>' +
+
+    '<div class="intro-card">' +
+      '<h2>How it works</h2>' +
+      '<p>Think of a specific person you want to support, and pick the option below that best matches what you have in mind. The tool will ask a few short questions and recommend whether mentoring or coaching is the better fit, with the rationale and the next steps.</p>' +
+      '<p style="color:#888;font-size:13.5px;margin-bottom:0">Your answers stay in this browser. Nothing is sent or stored anywhere.</p>' +
+
+      '<div class="intro-prompt">What brings you here?</div>' +
+
+      '<div class="path-cards">' +
+        '<button class="path-card task" id="path-task">' +
+          '<div class="path-icon">' + taskIcon + '</div>' +
+          '<div class="path-title">A specific task or skill</div>' +
+          '<div class="path-desc">They need support with a defined piece of work, a skill they are building, or a performance area. The recommendation comes from how their capability and motivation map against the task in front of them.</div>' +
+          '<div class="path-meta">12 questions &middot; about 4 minutes</div>' +
+          '<div class="path-cta">Start this path &rarr;</div>' +
+        '</button>' +
+
+        '<button class="path-card developmental" id="path-dev">' +
+          '<div class="path-icon">' + devIcon + '</div>' +
+          '<div class="path-title">Broader development</div>' +
+          '<div class="path-desc">The support is not about one task. Confidence, career direction, navigating a transition, broadening perspective, or building self-awareness. The recommendation considers what kind of relationship will help them grow.</div>' +
+          '<div class="path-meta">6 questions &middot; about 2 minutes</div>' +
+          '<div class="path-cta">Start this path &rarr;</div>' +
+        '</button>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="footer-note">Aligned with Story Contracting&rsquo;s Mentoring &amp; Coaching Programme and The Liberator (D2: Flexibly Adapt Style).</div>';
+
+  setTimeout(() => {
+    document.getElementById('path-task').addEventListener('click', () => startPath('task'));
+    document.getElementById('path-dev').addEventListener('click', () => startPath('developmental'));
+  }, 0);
+
+  return container;
+}
+
+// =====================================================================
+//  QUESTION SCREEN
+// =====================================================================
+function buildQuestion() {
+  const container = document.createElement('div');
+  container.className = 'container';
+
+  const QS = getQuestions();
+  const q = QS[state.qIndex];
+  const total = QS.length;
+  const pct = ((state.qIndex) / total) * 100;
+  const answeredPct = (state.answers.filter(a => a !== null).length / total) * 100;
+
+  // Progress bar
+  const progress = document.createElement('div');
+  progress.className = 'progress-wrap';
+  progress.innerHTML =
+    '<div class="progress-text">Question ' + (state.qIndex + 1) + ' of ' + total + '</div>' +
+    '<div class="progress-bar"><div class="progress-fill" style="width:' + Math.max(pct, answeredPct) + '%"></div></div>';
+  container.appendChild(progress);
+
+  // Question card
+  const card = document.createElement('div');
+  card.className = 'q-card';
+
+  const sectionEl = document.createElement('div');
+  sectionEl.className = 'q-section ' + (q.sectionClass || '');
+  sectionEl.textContent = q.section;
+  card.appendChild(sectionEl);
+
+  const textEl = document.createElement('div');
+  textEl.className = 'q-text';
+  textEl.textContent = q.text;
+  card.appendChild(textEl);
+
+  if (q.hint) {
+    const hintEl = document.createElement('div');
+    hintEl.className = 'q-hint';
+    hintEl.textContent = q.hint;
+    card.appendChild(hintEl);
+  }
+
+  const optionsEl = document.createElement('div');
+  optionsEl.className = 'q-options';
+
+  const currentAnswer = state.answers[state.qIndex];
+
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'q-option' + (currentAnswer && currentAnswer.optionIdx === idx ? ' selected' : '');
+    btn.innerHTML = '<span class="q-option-dot"></span><span>' + opt.label + '</span>';
+    btn.addEventListener('click', () => {
+      playClick();
+      state.answers[state.qIndex] = Object.assign({ optionIdx: idx }, opt);
+      // Auto-advance after a short pause for visual confirmation
+      render();
+      setTimeout(() => {
+        if (state.qIndex < QS.length - 1) {
+          playAdvance();
+          state.qIndex += 1;
+        } else {
+          playReveal();
+          state.view = 'result';
+        }
+        render();
+      }, 380);
+    });
+    optionsEl.appendChild(btn);
+  });
+  card.appendChild(optionsEl);
+
+  // Back button (only; forward motion is handled by auto-advance)
+  const nav = document.createElement('div');
+  nav.className = 'q-nav';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'nav-btn';
+  prevBtn.innerHTML = '&larr; Back';
+  prevBtn.disabled = state.qIndex === 0;
+  prevBtn.addEventListener('click', () => {
+    if (state.qIndex > 0) { playReturn(); state.qIndex -= 1; render(); }
+  });
+  nav.appendChild(prevBtn);
+
+  card.appendChild(nav);
+  container.appendChild(card);
+
+  return container;
+}
+
+// =====================================================================
+//  SCORING
+// =====================================================================
+function computeScores() {
+  if (state.path === 'developmental') {
+    return computeDevScores();
+  }
+  const canDoAnswers = state.answers.filter((_, i) => QUESTIONS[i].dimension === 'canDo');
+  const willDoAnswers = state.answers.filter((_, i) => QUESTIONS[i].dimension === 'willDo');
+  const approachAnswers = state.answers.filter((_, i) => QUESTIONS[i].dimension === 'approach');
+
+  const canDoAvg = canDoAnswers.reduce((s, a) => s + a.score, 0) / canDoAnswers.length;
+  const willDoAvg = willDoAnswers.reduce((s, a) => s + a.score, 0) / willDoAnswers.length;
+  const approachSum = approachAnswers.reduce((s, a) => s + a.coachBias, 0); // 0 to 40
+
+  // Build a 0-100 coaching score
+  // canDo: weight 35
+  // willDo: weight 25
+  // approach: weight 40 (already 0-40 from 4x0-10)
+  const canDoContrib = ((canDoAvg - 1) / 3) * 35;
+  const willDoContrib = ((willDoAvg - 1) / 3) * 25;
+  const coachScore = canDoContrib + willDoContrib + approachSum;
+
+  // Recommendation
+  let recommendation, certainty;
+  if (coachScore >= 60) {
+    recommendation = 'coaching';
+    certainty = coachScore >= 75 ? 'strong' : 'clear';
+  } else if (coachScore >= 50) {
+    recommendation = 'coaching';
+    certainty = 'borderline';
+  } else if (coachScore >= 40) {
+    recommendation = 'mentoring';
+    certainty = 'borderline';
+  } else {
+    recommendation = 'mentoring';
+    certainty = coachScore <= 25 ? 'strong' : 'clear';
+  }
+
+  // Flags for edge cases
+  let flag = null;
+  if (canDoAvg <= 1.5 && willDoAvg <= 1.6) {
+    flag = 'directing';
+  } else if (canDoAvg >= 3.7 && willDoAvg >= 3.7 && approachSum >= 32) {
+    flag = 'delegating';
+  }
+
+  return { canDoAvg, willDoAvg, approachSum, coachScore, recommendation, certainty, flag, path: 'task' };
+}
+
+// Developmental path: questions all share a single coachBias dimension.
+// Raw sum of 6 questions ranges 6 to 54 (each option scored 1 to 9 typically).
+// Normalised to 0-100.
+function computeDevScores() {
+  const sum = state.answers.reduce((s, a) => s + a.coachBias, 0);
+  // Theoretical min/max based on the actual options provided
+  let minTotal = 0, maxTotal = 0;
+  DEV_QUESTIONS.forEach(q => {
+    const biases = q.options.map(o => o.coachBias);
+    minTotal += Math.min.apply(null, biases);
+    maxTotal += Math.max.apply(null, biases);
+  });
+  const coachScore = ((sum - minTotal) / (maxTotal - minTotal)) * 100;
+
+  const recommendation = coachScore >= 50 ? 'coaching' : 'mentoring';
+  const dist = Math.abs(coachScore - 50);
+  const certainty = dist >= 25 ? 'strong' : dist >= 10 ? 'clear' : 'borderline';
+
+  // Pull out the chosen goal and level labels for the result pills
+  const goalLabel = state.answers[0].goalLabel || '';
+  const levelLabel = state.answers[1].levelLabel || '';
+
+  return { coachScore, recommendation, certainty, flag: null, goalLabel, levelLabel, path: 'developmental' };
+}
+
+// =====================================================================
+//  RATIONALE
+// =====================================================================
+function buildRationale(scores) {
+  if (scores.path === 'developmental') {
+    return buildDevRationale(scores);
+  }
+  const { canDoAvg, willDoAvg, recommendation, approachSum } = scores;
+
+  // Plain language labels for the averages
+  const canDoLabel = canDoAvg < 1.7 ? 'low'
+                   : canDoAvg < 2.6 ? 'moderate'
+                   : canDoAvg < 3.4 ? 'good'
+                   : 'high';
+  const willDoLabel = willDoAvg < 1.7 ? 'low'
+                    : willDoAvg < 2.6 ? 'moderate to good'
+                    : willDoAvg < 3.4 ? 'good to high'
+                    : 'high';
+
+  // Pull specific answers to reflect back
+  const teachAnswer = state.answers[3];     // teach colleague
+  const expertiseAnswer = state.answers[8]; // who holds expertise
+  const goalAnswer = state.answers[9];      // goal
+  const directionAnswer = state.answers[10];// close direction response
+  const focusAnswer = state.answers[11];    // focus of support
+
+  const lines = [];
+
+  lines.push('You described their <strong>Can Do</strong> as <strong>' + canDoLabel + '</strong> and their <strong>Will Do</strong> as <strong>' + willDoLabel + '</strong>.');
+
+  if (recommendation === 'mentoring') {
+    if (canDoAvg < 2.6) {
+      lines.push('Their capability is still developing, which usually means they benefit from someone in the room who can share knowledge, model good judgement and stay close to the decision-making.');
+    } else {
+      lines.push('Even though their capability is reasonable, the wider context suggests a mentoring approach is the better fit.');
+    }
+
+    if (expertiseAnswer.coachBias <= 3) {
+      lines.push('You hold more expertise on this topic, which gives you genuine ground to mentor from.');
+    }
+    if (goalAnswer.coachBias <= 3) {
+      lines.push('Your goal is knowledge transfer and shaping judgement, which sits at the heart of what mentoring does.');
+    }
+    if (directionAnswer.coachBias <= 4) {
+      lines.push('You also noted that close direction would still be welcomed. That tells you they are not yet at the point where stepping back would help.');
+    }
+    if (focusAnswer.coachBias <= 3) {
+      lines.push('The focus is on longer-term growth, which is exactly what a mentoring relationship is set up for.');
+    }
+  } else {
+    if (canDoAvg >= 2.6 && willDoAvg >= 2.6) {
+      lines.push('Their capability and motivation are well established. They have the foundation to work through things themselves, with a skilled thinking partner alongside them.');
+    } else {
+      lines.push('Even though the Can Do and Will Do scores are not at the very top, the wider context suggests coaching is the better fit.');
+    }
+
+    if (expertiseAnswer.coachBias >= 7) {
+      lines.push('You noted that on this specific topic they hold equal or greater expertise. That is a classic coaching signal: your value is in helping them think, not in providing answers.');
+    }
+    if (goalAnswer.coachBias >= 7) {
+      lines.push('The goal is to sharpen judgement they already have, rather than to transfer knowledge.');
+    }
+    if (directionAnswer.coachBias >= 7) {
+      lines.push('You also flagged that close direction would feel intrusive or counterproductive. That is the moment to step back and let them lead the thinking.');
+    }
+    if (focusAnswer.coachBias >= 7) {
+      lines.push('The focus is a specific performance area, where coaching conversations can move quickly and concretely.');
+    }
+  }
+
+  return lines.join(' ');
+}
+
+function buildDevRationale(scores) {
+  const { recommendation } = scores;
+  const goalA = state.answers[0];
+  const levelA = state.answers[1];
+  const styleA = state.answers[2];
+  const awareA = state.answers[3];
+  const relA = state.answers[4];
+  const timeA = state.answers[5];
+
+  const lines = [];
+
+  // Lead with what they said the goal is
+  const goalIntro = {
+    'Confidence': 'You are looking to build their <strong>confidence</strong>.',
+    'Career direction': 'You are looking to support them with <strong>career direction or a transition</strong>.',
+    'Perspective': 'You are looking to help them <strong>broaden their perspective</strong>.',
+    'Sharpened thinking': 'You are looking to help them <strong>sharpen their own thinking</strong> on choices ahead.'
+  }[goalA.goalLabel] || 'You are looking to support their broader development.';
+  lines.push(goalIntro);
+
+  if (recommendation === 'mentoring') {
+    // Reasons that push toward mentoring
+    if (goalA.coachBias <= 2) {
+      lines.push('That kind of growth tends to come from a relationship with someone who has been there. The lived experience of a mentor lands differently than a thinking partner could.');
+    }
+    if (levelA.coachBias <= 4) {
+      lines.push('They are still building their footing in this role, which is exactly the stage where mentoring adds most.');
+    }
+    if (styleA.coachBias <= 4) {
+      lines.push('You think experience and stories would help them more than question-led reflection. That is mentoring\'s strength.');
+    }
+    if (awareA.coachBias <= 4) {
+      lines.push('Their self-awareness is still developing, and a mentor can help them see patterns they would not catch alone.');
+    }
+    if (relA.coachBias <= 4) {
+      lines.push('They need someone outside their line, ideally with experience to share. That is the shape of a mentoring relationship.');
+    }
+    if (timeA.coachBias <= 4) {
+      lines.push('The longer time horizon suits the slower-burn nature of a mentoring partnership.');
+    }
+  } else {
+    // Reasons that push toward coaching
+    if (goalA.coachBias >= 7) {
+      lines.push('That kind of growth comes from being asked the right questions, not given the right answers. Coaching is built for it.');
+    }
+    if (levelA.coachBias >= 6) {
+      lines.push('They are experienced enough to bring real material to the conversation, which is what coaching needs.');
+    }
+    if (styleA.coachBias >= 6) {
+      lines.push('You think questions and reflection would help them more than experience sharing, which points firmly at coaching.');
+    }
+    if (awareA.coachBias >= 6) {
+      lines.push('Their self-awareness is solid, so a coach can lean on that foundation rather than having to build it.');
+    }
+    if (relA.coachBias >= 6) {
+      lines.push('A trained thinking partner focused on the topic at hand is more useful here than a wider mentoring relationship.');
+    }
+    if (timeA.coachBias >= 6) {
+      lines.push('The shorter, goal-focused time horizon fits how coaching works at its best.');
+    }
+  }
+
+  return lines.join(' ');
+}
+const RECOMMENDATION_CONTENT = {
+  mentoring: {
+    title: 'Mentoring',
+    eyebrow: 'Recommended approach',
+    summary: 'A developmental relationship in which a more experienced person shares knowledge, perspective and insight to build the other person\'s capability, confidence and longer-term growth.',
+    behaviours: [
+      { title: 'Guide and explain', text: 'Brief them clearly, share the reasoning behind decisions, model how you would approach things.' },
+      { title: 'Invite their thinking', text: 'Actively seek their opinion and judgement on the work, not just their compliance.' },
+      { title: 'Stay close to decisions', text: 'Keep oversight of the bigger calls while letting them get hands-on with the task itself.' },
+      { title: 'Build confidence', text: 'Use positive regard and timely recognition as they grow, even when correcting course.' }
+    ],
+    nextSteps: [
+      'Initiate the <strong>matching process</strong> via the L&amp;D Mentoring &amp; Coaching channel, so the right mentor is paired to the person.',
+      'Use the <strong>Mentor Charter and Agreement Template</strong> to contract the relationship clearly, including confidentiality and escalation.',
+      'Set up the <strong>Continuous Development Log</strong> so commitments and progress are tracked across sessions.',
+      'Connect the mentoring goals to <strong>Evolve</strong>, so career aspirations and personal development are joined up.'
+    ],
+    altBlurb: 'If their capability and motivation grow faster than expected, you may shift towards coaching earlier than planned. Watch for them solving problems independently and wanting more space to lead.'
+  },
+  coaching: {
+    title: 'Coaching',
+    eyebrow: 'Recommended approach',
+    summary: 'A structured, conversation-based approach in which the coach uses skilled questioning and active listening to help someone explore challenges, generate their own solutions and develop independent judgement.',
+    behaviours: [
+      { title: 'Ask, do not tell', text: 'Use open questions to surface their thinking. Resist providing answers unless they ask.' },
+      { title: 'Listen actively', text: 'Hold the space. Reflect back what you hear. Notice what is unsaid as well as what is said.' },
+      { title: 'Step back from direction', text: 'Routine decisions belong to them. Joint problem-solving is reserved for genuinely complex situations.' },
+      { title: 'Support and recognise', text: 'Be a sounding board and trusted colleague. Stay available without taking over.' }
+    ],
+    nextSteps: [
+      'Initiate the <strong>matching process</strong> via the L&amp;D Mentoring &amp; Coaching channel, so the right coach is paired to the person.',
+      'Use the <strong>Coaching Agreement Template</strong> to contract the relationship, agree the topic focus and how often you will meet.',
+      'Agree the <strong>goal and success measure</strong> for the coaching together, so the conversations stay purposeful.',
+      'Schedule a short <strong>review point</strong> after the first three sessions to check the approach is still right.'
+    ],
+    altBlurb: 'If close direction starts to feel necessary again, that is a signal to step back into mentoring for that specific area. Coaching assumes the foundation is there.'
+  }
+};
+
+// Developmental content: framed around growth, confidence, career
+// and longer-term relationship rather than task-based capability.
+const DEV_CONTENT = {
+  mentoring: {
+    title: 'Mentoring',
+    eyebrow: 'Recommended approach',
+    summary: 'A developmental relationship in which a more experienced person shares their knowledge, perspective and experience to build the other person\'s confidence, career direction and longer-term growth. Sits outside the line management structure and usually runs over months or years.',
+    behaviours: [
+      { title: 'Share your experience', text: 'Talk openly about your own journey, what you learned, what you would do differently. Lived experience is the gift you bring.' },
+      { title: 'Build their confidence', text: 'Acknowledge their growth, normalise their wobbles, hold belief in them when they cannot quite hold it themselves.' },
+      { title: 'Open doors', text: 'Introduce them to people, opportunities and perspectives they would not otherwise meet. Be the connector as well as the counsel.' },
+      { title: 'Challenge gently', text: 'Ask the questions a wise friend would ask, including the uncomfortable ones. Care enough to be honest with them.' }
+    ],
+    nextSteps: [
+      'Initiate the <strong>matching process</strong> via the L&amp;D Mentoring &amp; Coaching channel, with a focus on someone outside their line and ideally outside their function or area.',
+      'Use the <strong>Mentor Charter and Agreement Template</strong> to contract the relationship, including how often you will meet and what stays confidential.',
+      'Connect the development goals to <strong>Evolve</strong>, so career aspirations and personal development join up with the wider performance system.',
+      'Plan for the longer term. This is built over months, not weeks, so the matching matters more than the speed.'
+    ],
+    altBlurb: 'If they develop strong self-awareness and start preferring questions over stories, you may shift towards coaching for a specific topic, while the broader mentoring relationship continues.'
+  },
+  coaching: {
+    title: 'Coaching',
+    eyebrow: 'Recommended approach',
+    summary: 'A structured, conversation-based approach in which the coach uses skilled questioning and active listening to help someone explore their own thinking, develop self-awareness, and find their own answers. Usually focused on a defined topic over weeks or months.',
+    behaviours: [
+      { title: 'Ask, do not tell', text: 'Use open questions to surface their thinking. Resist the temptation to share what you would do.' },
+      { title: 'Listen actively', text: 'Hold the space. Reflect back what you hear. Notice what is unsaid as well as what is said.' },
+      { title: 'Resist solving', text: 'Their development comes from them reaching their own conclusions. The work of finding the answer is part of the answer.' },
+      { title: 'Stay neutral', text: 'You are a thinking partner, not an advisor with a view. Park your own preferences at the door.' }
+    ],
+    nextSteps: [
+      'Initiate the <strong>matching process</strong> via the L&amp;D Mentoring &amp; Coaching channel, looking for someone with formal coaching training where possible.',
+      'Use the <strong>Coaching Agreement Template</strong> to contract the relationship, agree the topic focus and how often you will meet.',
+      'Define the <strong>goal and what success looks like</strong> together, so the conversations stay purposeful and you can both tell when it has worked.',
+      'Plan a <strong>review point</strong> after the first few sessions to check coaching is still the right approach, or whether mentoring would now serve better.'
+    ],
+    altBlurb: 'If they would benefit from someone sharing experience and opening doors as well as asking questions, mentoring may be the better frame, either alongside or instead.'
+  }
+};
+
+function getContent(recommendation) {
+  return state.path === 'developmental' ? DEV_CONTENT[recommendation] : RECOMMENDATION_CONTENT[recommendation];
+}
+
+// =====================================================================
+//  RESULT SCREEN
+// =====================================================================
+function buildResult() {
+  const container = document.createElement('div');
+  container.className = 'container';
+
+  const scores = computeScores();
+  const content = getContent(scores.recommendation);
+  const altContent = getContent(scores.recommendation === 'mentoring' ? 'coaching' : 'mentoring');
+
+  // Banner
+  const banner = document.createElement('div');
+  banner.className = 'result-banner ' + scores.recommendation;
+  const certWord = scores.certainty === 'strong' ? 'Strong match'
+                : scores.certainty === 'clear' ? 'Clear match'
+                : 'Worth a closer look';
+
+  let pillsHTML;
+  if (scores.path === 'developmental') {
+    pillsHTML =
+      '<div class="score-pill">Goal <strong>' + scores.goalLabel + '</strong></div>' +
+      '<div class="score-pill">Experience <strong>' + scores.levelLabel + '</strong></div>' +
+      '<div class="score-pill">Coaching fit <strong>' + Math.round(scores.coachScore) + '/100</strong></div>';
+  } else {
+    pillsHTML =
+      '<div class="score-pill">Can Do <strong>' + scoreLabel(scores.canDoAvg) + '</strong></div>' +
+      '<div class="score-pill">Will Do <strong>' + scoreLabel(scores.willDoAvg) + '</strong></div>' +
+      '<div class="score-pill">Coaching score <strong>' + Math.round(scores.coachScore) + '/100</strong></div>';
+  }
+
+  banner.innerHTML =
+    '<div class="result-eyebrow">' + content.eyebrow + ' &middot; ' + certWord + '</div>' +
+    '<div class="result-title">' + content.title + '</div>' +
+    '<div class="result-summary">' + content.summary + '</div>' +
+    '<div class="result-scores">' + pillsHTML + '</div>';
+  container.appendChild(banner);
+
+  // Edge case flag
+  if (scores.flag) {
+    const flag = document.createElement('div');
+    flag.className = 'result-flag';
+    if (scores.flag === 'directing') {
+      flag.innerHTML =
+        '<div class="result-flag-icon">!</div>' +
+        '<div class="result-flag-text"><strong>Worth pausing before mentoring.</strong> Their Can Do and Will Do are both very low. Directing may be the more honest starting point: clear briefings, explicit expectations and closer monitoring, until the first signs of capability and willingness appear. The mentoring guidance below still applies once that foundation is in place.</div>';
+    } else if (scores.flag === 'delegating') {
+      flag.innerHTML =
+        '<div class="result-flag-icon">!</div>' +
+        '<div class="result-flag-text"><strong>Worth considering Delegating.</strong> Their Can Do and Will Do are both very high, and they hold real ownership. They may be ready to run with this end to end. Coaching will still serve them well as a thinking partner, but agree the standard and the touch points and then trust them with the rest.</div>';
+    }
+    container.appendChild(flag);
+  }
+
+  // Rationale section
+  const rationaleSection = document.createElement('div');
+  rationaleSection.className = 'result-section ' + scores.recommendation;
+  rationaleSection.innerHTML =
+    '<h3>Why this fits</h3>' +
+    '<p>' + buildRationale(scores) + '</p>';
+  container.appendChild(rationaleSection);
+
+  // Behaviours section
+  const behaviourSection = document.createElement('div');
+  behaviourSection.className = 'result-section ' + scores.recommendation;
+  let behaviourHTML = '<h3>What good ' + content.title.toLowerCase() + ' looks like</h3>' +
+                      '<p>Key behaviours for the person taking this on.</p>' +
+                      '<div class="behaviour-grid">';
+  content.behaviours.forEach(b => {
+    behaviourHTML += '<div class="behaviour-card"><div class="behaviour-card-title">' + b.title + '</div><div class="behaviour-card-text">' + b.text + '</div></div>';
+  });
+  behaviourHTML += '</div>';
+  behaviourSection.innerHTML = behaviourHTML;
+  container.appendChild(behaviourSection);
+
+  // Next steps section
+  const stepsSection = document.createElement('div');
+  stepsSection.className = 'result-section ' + scores.recommendation;
+  let stepsHTML = '<h3>What to do next</h3><div class="next-steps">';
+  content.nextSteps.forEach(s => {
+    stepsHTML += '<div class="next-step"><div class="next-step-num"></div><div class="next-step-text">' + s + '</div></div>';
+  });
+  stepsHTML += '</div>';
+  stepsSection.innerHTML = stepsHTML;
+  container.appendChild(stepsSection);
+
+  // Alternative toggle
+  const altWrap = document.createElement('div');
+  altWrap.className = 'alt-toggle';
+  altWrap.innerHTML = '<button class="alt-btn" id="alt-btn">Show me the alternative</button>';
+  container.appendChild(altWrap);
+
+  // Actions
+  const actions = document.createElement('div');
+  actions.className = 'action-row';
+  actions.innerHTML =
+    '<button class="action-btn primary" id="pdf-btn">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+      ' Download PDF summary' +
+    '</button>' +
+    '<button class="action-btn secondary" id="restart-btn">Run another assessment</button>';
+  container.appendChild(actions);
+
+  const footer = document.createElement('div');
+  footer.className = 'footer-note';
+  footer.innerHTML = 'Aligned with Story Contracting&rsquo;s Mentoring &amp; Coaching Programme and The Liberator (D2: Flexibly Adapt Style). Cross-referenced with CIPD and ILM/CMI standards.';
+  container.appendChild(footer);
+
+  // Wire up
+  setTimeout(() => {
+    document.getElementById('alt-btn').addEventListener('click', (e) => {
+      playClick();
+      // toggle the alternative panel
+      const existing = document.getElementById('alt-panel');
+      if (existing) {
+        existing.remove();
+        e.target.textContent = 'Show me the alternative';
+        return;
+      }
+      const panel = document.createElement('div');
+      panel.className = 'alt-panel';
+      panel.id = 'alt-panel';
+      panel.innerHTML =
+        '<h4>If you went with ' + altContent.title + ' instead</h4>' +
+        '<p>' + altContent.summary + '</p>' +
+        '<p><strong>Why it might still apply:</strong> ' + content.altBlurb + '</p>';
+      e.target.parentNode.appendChild(panel);
+      e.target.textContent = 'Hide the alternative';
+    });
+
+    document.getElementById('pdf-btn').addEventListener('click', () => { playDownload(); generatePDF(scores, content); });
+    document.getElementById('restart-btn').addEventListener('click', () => { playReturn(); resetAll(); });
+  }, 0);
+
+  return container;
+}
+
+function scoreLabel(avg) {
+  if (avg < 1.7) return 'Low';
+  if (avg < 2.6) return 'Moderate';
+  if (avg < 3.4) return 'Good';
+  return 'High';
+}
+
+// =====================================================================
+//  RESET
+// =====================================================================
+function resetAll() {
+  state = {
+    view: 'intro',
+    path: null,
+    qIndex: 0,
+    answers: []
+  };
+  render();
+}
+
+// =====================================================================
+//  PDF GENERATION
+//  Modelled on the Wayfinder's Skill/Will Course of Action PDF.
+//  Single page, plain text PDF, fully self-contained.
+// =====================================================================
+function generatePDF(scores, content) {
+  try {
+    const W = 595, H = 842, M = 50; // A4 in points
+    let objCount = 0;
+    const objects = [];
+    function addObj(data) {
+      objCount++;
+      objects.push({ id: objCount, data });
+      return objCount;
+    }
+
+    function escPDF(str) {
+      return String(str).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+    }
+
+    // Decode common HTML entities for PDF text output, since stripping tags
+    // alone leaves things like &amp; in the output.
+    function decodeEntities(str) {
+      return String(str)
+        .replace(/&amp;/g, '&')
+        .replace(/&rsquo;/g, "'")
+        .replace(/&lsquo;/g, "'")
+        .replace(/&rdquo;/g, '"')
+        .replace(/&ldquo;/g, '"')
+        .replace(/&middot;/g, '.')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&hellip;/g, '...')
+        .replace(/&ndash;/g, '-')
+        .replace(/&mdash;/g, '-');
+    }
+
+    // Convenience: strip tags and decode entities in one go.
+    function plain(str) {
+      return decodeEntities(String(str).replace(/<[^>]+>/g, ''));
+    }
+
+    function wrap(text, width, fontSize) {
+      // Rough character width estimate for Helvetica
+      const approxChars = Math.floor(width / (fontSize * 0.5));
+      const words = text.split(/\s+/);
+      const lines = [];
+      let cur = '';
+      for (const w of words) {
+        if ((cur + ' ' + w).trim().length > approxChars) {
+          if (cur) lines.push(cur);
+          cur = w;
+        } else {
+          cur = (cur + ' ' + w).trim();
+        }
+      }
+      if (cur) lines.push(cur);
+      return lines;
+    }
+
+    // Story Blue / Teal hex to RGB 0-1
+    const blue = scores.recommendation === 'mentoring' ? '0 0.38 0.68' : '0 0.62 0.63';
+    const dark = '0.10 0.22 0.36';
+    const grey = '0.45 0.50 0.56';
+    const lightGrey = '0.82 0.86 0.91';
+
+    let s = '';
+
+    // Top accent bar
+    s += blue + ' rg\n';
+    s += '0 ' + (H - 12) + ' ' + W + ' 12 re f\n';
+
+    // Title
+    let y = H - 60;
+    s += dark + ' rg\nBT /F1 22 Tf ' + M + ' ' + y + ' Td (Mentor or Coach?) Tj ET\n';
+    y -= 22;
+    s += grey + ' rg\nBT /F2 10 Tf ' + M + ' ' + y + ' Td (Decision summary - Story Contracting Learning ' + String.fromCharCode(38) + ' Development) Tj ET\n';
+    y -= 28;
+
+    // Recommendation box
+    s += blue + ' rg\n' + M + ' ' + (y - 60) + ' ' + (W - 2*M) + ' 60 re f\n';
+    s += '1 1 1 rg\nBT /F1 11 Tf ' + (M + 14) + ' ' + (y - 18) + ' Td (RECOMMENDED APPROACH) Tj ET\n';
+    s += '1 1 1 rg\nBT /F1 26 Tf ' + (M + 14) + ' ' + (y - 46) + ' Td (' + content.title + ') Tj ET\n';
+    y -= 80;
+
+    // Scores row
+    const scoreRow = scores.path === 'developmental'
+      ? 'Goal: ' + scores.goalLabel + '    |    Experience: ' + scores.levelLabel + '    |    Coaching fit: ' + Math.round(scores.coachScore) + '/100'
+      : 'Can Do: ' + scoreLabel(scores.canDoAvg) + '    |    Will Do: ' + scoreLabel(scores.willDoAvg) + '    |    Coaching score: ' + Math.round(scores.coachScore) + '/100';
+    s += dark + ' rg\nBT /F1 10 Tf ' + M + ' ' + y + ' Td (' + escPDF(scoreRow) + ') Tj ET\n';
+    y -= 24;
+
+    // Why this fits
+    s += dark + ' rg\nBT /F1 13 Tf ' + M + ' ' + y + ' Td (Why this fits) Tj ET\n';
+    y -= 6;
+    s += blue + ' rg\n' + M + ' ' + y + ' ' + 40 + ' 2 re f\n';
+    y -= 14;
+
+    // Strip HTML tags for PDF body
+    const rationaleText = plain(buildRationale(scores));
+    const rLines = wrap(rationaleText, W - 2*M, 11);
+    s += dark + ' rg\n';
+    rLines.forEach(line => {
+      s += 'BT /F2 11 Tf ' + M + ' ' + y + ' Td (' + escPDF(line) + ') Tj ET\n';
+      y -= 15;
+    });
+    y -= 10;
+
+    // Definition / summary
+    s += dark + ' rg\nBT /F1 13 Tf ' + M + ' ' + y + ' Td (What ' + content.title + ' means) Tj ET\n';
+    y -= 6;
+    s += blue + ' rg\n' + M + ' ' + y + ' ' + 40 + ' 2 re f\n';
+    y -= 14;
+    const dLines = wrap(content.summary, W - 2*M, 11);
+    s += dark + ' rg\n';
+    dLines.forEach(line => {
+      s += 'BT /F2 11 Tf ' + M + ' ' + y + ' Td (' + escPDF(line) + ') Tj ET\n';
+      y -= 15;
+    });
+    y -= 10;
+
+    // Key behaviours
+    s += dark + ' rg\nBT /F1 13 Tf ' + M + ' ' + y + ' Td (Key behaviours) Tj ET\n';
+    y -= 6;
+    s += blue + ' rg\n' + M + ' ' + y + ' ' + 40 + ' 2 re f\n';
+    y -= 16;
+    content.behaviours.forEach(b => {
+      s += dark + ' rg\nBT /F1 10 Tf ' + M + ' ' + y + ' Td (' + escPDF(b.title) + ') Tj ET\n';
+      y -= 13;
+      const bLines = wrap(b.text, W - 2*M - 10, 10);
+      bLines.forEach(line => {
+        s += dark + ' rg\nBT /F2 10 Tf ' + (M + 10) + ' ' + y + ' Td (' + escPDF(line) + ') Tj ET\n';
+        y -= 13;
+      });
+      y -= 4;
+    });
+    y -= 6;
+
+    // Next steps
+    s += dark + ' rg\nBT /F1 13 Tf ' + M + ' ' + y + ' Td (What to do next) Tj ET\n';
+    y -= 6;
+    s += blue + ' rg\n' + M + ' ' + y + ' ' + 40 + ' 2 re f\n';
+    y -= 16;
+    content.nextSteps.forEach((step, i) => {
+      const cleanStep = plain(step);
+      const stepText = (i + 1) + '. ' + cleanStep;
+      const sLines = wrap(stepText, W - 2*M, 10);
+      sLines.forEach((line, li) => {
+        s += dark + ' rg\nBT /F2 10 Tf ' + (li === 0 ? M : M + 12) + ' ' + y + ' Td (' + escPDF(line) + ') Tj ET\n';
+        y -= 13;
+      });
+      y -= 3;
+    });
+
+    // Footer
+    s += grey + ' rg\nBT /F2 8 Tf ' + M + ' ' + (M - 10) + ' Td (' + escPDF('Story Contracting L&D | Mentoring & Coaching Programme | Aligned to The Liberator | Generated ' + new Date().toLocaleDateString('en-GB')) + ') Tj ET\n';
+
+    // Assemble PDF
+    const catalogId = addObj('<< /Type /Catalog /Pages 2 0 R >>');
+    const pagesId = addObj('');
+    const font1Id = addObj('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>');
+    const font2Id = addObj('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+    const streamBytes = new TextEncoder().encode(s);
+    const streamId = addObj('<< /Length ' + streamBytes.length + ' >>\nstream\n' + s + 'endstream');
+    const pageId = addObj('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + W + ' ' + H + '] /Contents ' + streamId + ' 0 R /Resources << /Font << /F1 ' + font1Id + ' 0 R /F2 ' + font2Id + ' 0 R >> >> >>');
+    objects[1].data = '<< /Type /Pages /Kids [' + pageId + ' 0 R] /Count 1 >>';
+
+    let pdf = '%PDF-1.4\n';
+    const offsets = [];
+    objects.forEach(obj => {
+      offsets.push(pdf.length);
+      pdf += obj.id + ' 0 obj\n' + obj.data + '\nendobj\n';
+    });
+    const xo = pdf.length;
+    pdf += 'xref\n0 ' + (objCount + 1) + '\n0000000000 65535 f \n';
+    offsets.forEach(off => { pdf += String(off).padStart(10, '0') + ' 00000 n \n'; });
+    pdf += 'trailer\n<< /Size ' + (objCount + 1) + ' /Root ' + catalogId + ' 0 R >>\nstartxref\n' + xo + '\n%%EOF';
+
+    const blob = new Blob([pdf], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Mentor-or-Coach-' + content.title + '-' + new Date().toISOString().slice(0, 10) + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error('PDF generation error:', e);
+    alert('Sorry, there was a problem generating your PDF. Please try again.');
+  }
+}
+
+// =====================================================================
+//  BOOT
+// =====================================================================
+document.getElementById('welcome-btn').addEventListener('click', () => {
+  playAdvance();
+  document.getElementById('welcome-overlay').classList.add('dismissed');
+  render();
+});
+document.getElementById('welcome-overlay').addEventListener('click', (e) => {
+  if (e.target.id === 'welcome-overlay') {
+    playAdvance();
+    document.getElementById('welcome-overlay').classList.add('dismissed');
+    render();
+  }
+});
+
+// Render initial intro behind the overlay
+render();
+</script>
+</body>
+</html>
