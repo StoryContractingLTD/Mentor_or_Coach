@@ -179,6 +179,60 @@ html,body{min-height:100vh;background:#EAF4FB;font-family:'Barlow',system-ui,san
 .audio-toggle.muted{color:#8fa0b0;border-color:#dde5ed;background:#f6f8fa}
 .audio-toggle svg{width:18px;height:18px}
 
+/* Magnify (larger text) toggle */
+.magnify-btn{display:inline-flex;align-items:center;gap:7px;background:#fff8f0;border:2px solid #f5a84e;border-radius:20px;padding:7px 14px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:600;font-size:13px;color:#b05e00;box-shadow:0 4px 14px rgba(245,168,78,.14);transition:all .18s ease;white-space:nowrap}
+.magnify-btn:hover{border-color:#e07b00;background:#fef0dc;transform:translateY(-2px)}
+.magnify-btn.active{background:#f5a84e;border-color:#e07b00;color:white;box-shadow:0 4px 14px rgba(245,168,78,.35)}
+.magnify-btn svg{flex-shrink:0;transition:transform .18s ease}
+.magnify-btn:hover svg{transform:scale(1.1)}
+
+/* Larger text mode — toggled by .text-lg on <body>, cascades across every view */
+body.text-lg .welcome-title{font-size:60px}
+body.text-lg .welcome-sub{font-size:18px}
+body.text-lg .welcome-btn{font-size:17px;padding:15px 34px}
+body.text-lg .tag{font-size:13.5px}
+body.text-lg .back-btn{font-size:14.5px;padding:9px 18px}
+body.text-lg .title{font-size:52px}
+body.text-lg .subtitle{font-size:18px}
+body.text-lg .progress-text{font-size:13.5px}
+body.text-lg .q-section{font-size:13.5px}
+body.text-lg .q-text{font-size:36px}
+body.text-lg .q-hint{font-size:16px}
+body.text-lg .q-option{font-size:17.5px;padding:18px 22px}
+body.text-lg .nav-btn{font-size:17px;padding:13px 26px}
+body.text-lg .intro-card h2{font-size:30px}
+body.text-lg .intro-card p{font-size:17.5px;line-height:1.78}
+body.text-lg .intro-prompt{font-size:14.5px}
+body.text-lg .intro-step-num{font-size:34px}
+body.text-lg .intro-step-title{font-size:17px}
+body.text-lg .intro-step-desc{font-size:15.5px;line-height:1.6}
+body.text-lg .path-title{font-size:26px}
+body.text-lg .path-desc{font-size:16px;line-height:1.7}
+body.text-lg .path-meta{font-size:13px}
+body.text-lg .path-cta{font-size:16px}
+body.text-lg .result-eyebrow{font-size:14.5px}
+body.text-lg .result-title{font-size:72px}
+body.text-lg .result-summary{font-size:19px;line-height:1.7}
+body.text-lg .score-pill{font-size:15px}
+body.text-lg .score-pill strong{font-size:18px}
+body.text-lg .result-flag-text{font-size:16px;line-height:1.7}
+body.text-lg .result-section h3{font-size:24px}
+body.text-lg .result-section p{font-size:16.5px;line-height:1.78}
+body.text-lg .behaviour-card-title{font-size:16px}
+body.text-lg .behaviour-card-text{font-size:15px;line-height:1.65}
+body.text-lg .next-step-text{font-size:16px;line-height:1.7}
+body.text-lg .alt-btn{font-size:14.5px}
+body.text-lg .action-btn{font-size:16px;padding:13px 26px}
+body.text-lg .footer-note{font-size:13.5px}
+body.text-lg .magnify-btn{font-size:14.5px}
+
+/* Mobile bumps stay sensible when larger text is on */
+@media (max-width:600px){
+  body.text-lg .title{font-size:42px}
+  body.text-lg .q-text{font-size:28px}
+  body.text-lg .result-title{font-size:54px}
+}
+
 /* Footer note */
 .footer-note{text-align:center;color:#8fa0b0;font-size:12px;margin-top:36px;line-height:1.6;letter-spacing:.02em}
 
@@ -231,6 +285,13 @@ try {
   if (saved === 'off') audioEnabled = false;
 } catch(e) {}
 
+// Larger-text mode (accessibility) — persisted in localStorage, applied to <body>
+let largeText = false;
+try {
+  if (localStorage.getItem('mc-text') === 'lg') largeText = true;
+} catch(e) {}
+if (largeText) document.body.classList.add('text-lg');
+
 function getCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -256,6 +317,23 @@ function toggleAudio() {
     btn.title = audioEnabled ? 'Sound on, click to mute' : 'Sound off, click to enable';
   }
   if (audioEnabled) playClick();
+}
+
+// SVG icons for the magnify (larger text) toggle — magnifier with + for on, with - for off
+const MAGNIFY_PLUS_ICON  = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>';
+const MAGNIFY_MINUS_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>';
+
+function toggleLargeText() {
+  largeText = !largeText;
+  document.body.classList.toggle('text-lg', largeText);
+  try { localStorage.setItem('mc-text', largeText ? 'lg' : 'normal'); } catch(e) {}
+  const btn = document.getElementById('magnify-btn');
+  if (btn) {
+    btn.classList.toggle('active', largeText);
+    btn.innerHTML = (largeText ? MAGNIFY_MINUS_ICON : MAGNIFY_PLUS_ICON) + (largeText ? ' Reset text' : ' Larger text');
+    btn.title = largeText ? 'Reset text to default size' : 'Magnify text across all pages';
+  }
+  playClick();
 }
 
 // Soft single tick, used for option selection and small confirmations.
@@ -640,6 +718,15 @@ function buildHeader(rightEl) {
   const right = document.createElement('div');
   right.className = 'header-right';
   if (rightEl) right.appendChild(rightEl);
+
+  // Magnify (larger text) toggle — persists across all pages
+  const magnifyBtn = document.createElement('button');
+  magnifyBtn.className = 'magnify-btn' + (largeText ? ' active' : '');
+  magnifyBtn.id = 'magnify-btn';
+  magnifyBtn.innerHTML = (largeText ? MAGNIFY_MINUS_ICON : MAGNIFY_PLUS_ICON) + (largeText ? ' Reset text' : ' Larger text');
+  magnifyBtn.title = largeText ? 'Reset text to default size' : 'Magnify text across all pages';
+  magnifyBtn.addEventListener('click', toggleLargeText);
+  right.appendChild(magnifyBtn);
 
   // Audio toggle (always present)
   const audioBtn = document.createElement('button');
