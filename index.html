@@ -437,7 +437,7 @@ const QUESTIONS = [
       { label: 'New to it, still learning the basics', score: 1 },
       { label: 'Growing, getting there but not yet solid', score: 2 },
       { label: 'Capable, can do the work confidently', score: 3 },
-      { label: 'Fully expert, may know more than I do', score: 4 }
+      { label: 'Fully expert, a recognised authority on this', score: 4 }
     ],
     dimension: 'canDo'
   },
@@ -448,7 +448,7 @@ const QUESTIONS = [
     text: 'Have they done this task successfully before?',
     options: [
       { label: 'Never, or never independently', score: 1 },
-      { label: 'A few times, with my support', score: 2 },
+      { label: 'A few times, with hands-on support', score: 2 },
       { label: 'Multiple times, reliably', score: 3 },
       { label: 'It is routine for them', score: 4 }
     ],
@@ -474,7 +474,7 @@ const QUESTIONS = [
     text: 'Could they explain or teach this to a colleague?',
     options: [
       { label: 'Not yet, they are still learning themselves', score: 1 },
-      { label: 'With prompts and support from me', score: 2 },
+      { label: 'With prompts and support from someone more experienced', score: 2 },
       { label: 'Yes, in most areas', score: 3 },
       { label: 'Confidently and with depth', score: 4 }
     ],
@@ -524,12 +524,12 @@ const QUESTIONS = [
   {
     section: 'Will Do',
     sectionClass: 'approach',
-    hint: 'How proactive are they without you prompting?',
+    hint: 'How proactive are they when no one is prompting them?',
     text: 'How much initiative do they take?',
     options: [
       { label: 'Waits to be told what to do', score: 1 },
-      { label: 'Checks with me before acting', score: 2 },
-      { label: 'Acts and updates me afterwards', score: 3 },
+      { label: 'Checks in with someone before acting', score: 2 },
+      { label: 'Acts and updates others afterwards', score: 3 },
       { label: 'Runs with things and manages themselves', score: 4 }
     ],
     dimension: 'willDo'
@@ -540,12 +540,12 @@ const QUESTIONS = [
     section: 'Approach',
     sectionClass: 'approach',
     hint: 'Mentoring needs an expertise gap. Coaching often works without one.',
-    text: 'On this specific topic, who holds more expertise?',
+    text: 'How does their expertise on this topic compare to others who could support them?',
     options: [
-      { label: 'I do, significantly more than they do', coachBias: 0 },
-      { label: 'I do, but only somewhat more', coachBias: 3 },
-      { label: 'We are roughly equal', coachBias: 7 },
-      { label: 'They may know more than I do', coachBias: 10 }
+      { label: 'There is a clear expertise gap they could learn from', coachBias: 0 },
+      { label: 'Some expertise gap, but not a huge one', coachBias: 3 },
+      { label: 'Roughly on par with the potential sources of support', coachBias: 7 },
+      { label: 'They may be the deepest expert available on this topic', coachBias: 10 }
     ],
     dimension: 'approach'
   },
@@ -566,7 +566,7 @@ const QUESTIONS = [
     section: 'Approach',
     sectionClass: 'approach',
     hint: 'Coaching steps back from direction. Mentoring stays close.',
-    text: 'How would they likely respond to close direction from me right now?',
+    text: 'How would they likely respond to close direction right now?',
     options: [
       { label: 'Welcome it, they want the steer', coachBias: 0 },
       { label: 'Accept it, but might want more space soon', coachBias: 4 },
@@ -1029,10 +1029,10 @@ function buildRationale(scores) {
     }
 
     if (expertiseAnswer.coachBias <= 3) {
-      lines.push('You hold more expertise on this topic, which gives you genuine ground to mentor from.');
+      lines.push('There is a clear expertise gap on this topic, which means a mentor has genuine ground to share knowledge from.');
     }
     if (goalAnswer.coachBias <= 3) {
-      lines.push('Your goal is knowledge transfer and shaping judgement, which sits at the heart of what mentoring does.');
+      lines.push('The goal of the support is knowledge transfer and shaping judgement, which sits at the heart of what mentoring does.');
     }
     if (directionAnswer.coachBias <= 4) {
       lines.push('You also noted that close direction would still be welcomed. That tells you they are not yet at the point where stepping back would help.');
@@ -1048,7 +1048,7 @@ function buildRationale(scores) {
     }
 
     if (expertiseAnswer.coachBias >= 7) {
-      lines.push('You noted that on this specific topic they hold equal or greater expertise. That is a classic coaching signal: your value is in helping them think, not in providing answers.');
+      lines.push('You also noted that they already hold equal or greater expertise on this specific topic. That is a classic coaching signal: the value of the support will come from helping them think, not from providing answers.');
     }
     if (goalAnswer.coachBias >= 7) {
       lines.push('The goal is to sharpen judgement they already have, rather than to transfer knowledge.');
